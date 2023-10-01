@@ -41,46 +41,17 @@ class Handler extends WebhookHandler
 Я предскажу твой день на завтра, проверю вашу совместимость с партнером, а также сделаю расклад на картах Таро 🔮
             ')->photo(Storage::path('start_logo.jpeg'))->send();
 
-            $this->chat->message('1')->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('💟 Любовный гороскоп'),
-                        ReplyButton::make('🔮 Гороскоп'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🟣 Магия чисел'),
-                        ReplyButton::make('🀄️ Карты таро'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏵 Восточный гороскоп'),
-                    ])
-            )
-                ->send();
+            $this->chat->message('1')->replyKeyboard(Helper::replyKeybordMainPage())->send();
         } else {
             $this->reply('Неизвестная команда');
         }
     }
 
-
     // Обрабатываем входящие сообщения
     protected function handleChatMessage(Stringable $text): void
     {
         if ($text == '🏠 Главное меню') {
-            $this->chat->message('🏠 Главное меню')->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('💟 Любовный гороскоп'),
-                        ReplyButton::make('🔮 Гороскоп'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🪬 Хиромантия'),
-                        ReplyButton::make('🀄️ Карты таро'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏵 Восточный гороскоп'),
-                    ])
-            )
-                ->send();
+            $this->chat->message('🏠 Главное меню')->replyKeyboard(Helper::replyKeybordMainPage())->send();
         }
 
         if ($text == '🪬 Хиромантия') {
@@ -88,21 +59,7 @@ class Handler extends WebhookHandler
 
 Хиромантия основывается главным образом на изучении формы, цвета и линии на ладони, а также длины пальцев. Некоторые хироманты также принимают во внимание узоры на подушечках пальцев.
 Гадание по руке позволяет определить удачу или неудачу. Ваша рука, линия на ладони и знания опытного хироманта помогут узнать о жизни и судьбе и лучше понять себя.
-            ')->photo(Storage::path('hiro1.webp'))->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('💟 Любовный гороскоп'),
-                        ReplyButton::make('🔮 Гороскоп'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🪬 Хиромантия'),
-                        ReplyButton::make('🀄️ Карты таро'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏵 Восточный гороскоп'),
-                    ])
-            )
-                ->send();
+            ')->photo(Storage::path('hiro1.webp'))->replyKeyboard(Helper::replyKeybordMainPage())->send();
 
                 $this->chat->message('*1. Линия жизни - чем длиннее, тем лучше*
 Линия жизни - её также называют "линией земли". это линия, которая проходит вокруг большого пальца. Обычно это дуга. Длина линии жизни не имеет отношения к продолжительности жизни человека. Он отражает здоровье и физическую жизнеспособность.
@@ -181,35 +138,8 @@ class Handler extends WebhookHandler
                 $messageIMG = 'love_horocope2.jpg';
             }
 
-
             $this->chat->message("$textMessage")->photo(Storage::path("$messageIMG"))
-                ->replyKeyboard(
-                    ReplyKeyboard::make()
-                        ->row([
-                            ReplyButton::make('♈️ Овен'),
-                            ReplyButton::make('♉️ Телец'),
-                            ReplyButton::make('♊️ Близнецы'),
-                        ])
-                        ->row([
-                            ReplyButton::make('♋️ Рак'),
-                            ReplyButton::make('♌️ Лев'),
-                            ReplyButton::make('♍️ Дева'),
-                        ])
-                        ->row([
-                            ReplyButton::make('♎️ Весы'),
-                            ReplyButton::make('♏️ Скорпион'),
-                            ReplyButton::make('♐️ Стрелец'),
-                        ])
-                        ->row([
-                            ReplyButton::make('♑️ Козерог'),
-                            ReplyButton::make('♒️ Водолей'),
-                            ReplyButton::make('♓️ Рыбы'),
-                        ])
-                        ->row([
-                            ReplyButton::make('🏠 Главное меню'),
-                        ])
-                )
-                ->send();
+                ->replyKeyboard(Helper::replyKeybordZodiac())->send();
 
             if ($text == '🔮 Гороскоп') {
                 $horoscope_type = 'general';
@@ -237,16 +167,11 @@ class Handler extends WebhookHandler
                 ->first();
 
             $homepage = file_get_contents("https://orakul.com/horoscope/astrologic/{$userChat->horoscope_type}/{$zodiac}/today.html");
-
             $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
-            // Выполняем поиск совпадений
             if (preg_match($pattern, $homepage, $matches)) {
-                // $matches[1] содержит текст, найденный между тегом
                 $foundText = $matches[2];
-                // Выводим найденный текст
                 $horo = trim(stristr($foundText, '<', true));
             } else {
-                // Если совпадений не найдено
                 $horo = "Гороскоп не найден";
             }
 
@@ -255,31 +180,13 @@ class Handler extends WebhookHandler
 
             $this->chat->message("*$text* на $todayDate
 
-🔮 $horo")->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('На завтра'),
-                        ReplyButton::make('На неделю'),
-                    ])
-                    ->row([
-                        ReplyButton::make('На месяц'),
-                        ReplyButton::make('На год'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏠 Главное меню'),
-                    ])
-            )
-                ->send();
+🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
             DB::table('telegraph_chats')
                 ->where('chat_id', $this->chat->chat_id)
-                ->update([
-                    'last_zodiac' => $zodiac,
-                    // 'horoscope_type' => $horoscope_type,
-                ]);
+                ->update(['last_zodiac' => $zodiac]);
         }
-
 
         // Гороскоп на завтра
         if ($text == 'На завтра') {
@@ -289,34 +196,15 @@ class Handler extends WebhookHandler
                 ->first();
 
             $homepage = file_get_contents("https://orakul.com/horoscope/astrologic/{$userChat->horoscope_type}/{$userChat->last_zodiac}/tomorrow.html");
-
             $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
-            // Выполняем поиск совпадений
             if (preg_match($pattern, $homepage, $matches)) {
-                // $matches[1] содержит текст, найденный между тегом
                 $foundText = $matches[2];
-                // Выводим найденный текст
                 $horo = trim(stristr($foundText, '<', true));
             } else {
-                // Если совпадений не найдено
                 $horo = "Гороскоп не найден";
             }
 
-            $this->chat->message("🔮 $horo")->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('На завтра'),
-                        ReplyButton::make('На неделю'),
-                    ])
-                    ->row([
-                        ReplyButton::make('На месяц'),
-                        ReplyButton::make('На год'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏠 Главное меню'),
-                    ])
-            )
-                ->send();
+            $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
             DB::table('telegraph_chats')
@@ -332,34 +220,15 @@ class Handler extends WebhookHandler
                 ->first();
 
             $homepage = file_get_contents("https://orakul.com/horoscope/astrologic/{$userChat->horoscope_type}/{$userChat->last_zodiac}/week.html");
-
             $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
-            // Выполняем поиск совпадений
             if (preg_match($pattern, $homepage, $matches)) {
-                // $matches[1] содержит текст, найденный между тегом
                 $foundText = $matches[2];
-                // Выводим найденный текст
                 $horo = trim(stristr($foundText, '<', true));
             } else {
-                // Если совпадений не найдено
                 $horo = "Гороскоп не найден";
             }
 
-            $this->chat->message("🔮 $horo")->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('На завтра'),
-                        ReplyButton::make('На неделю'),
-                    ])
-                    ->row([
-                        ReplyButton::make('На месяц'),
-                        ReplyButton::make('На год'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏠 Главное меню'),
-                    ])
-            )
-                ->send();
+            $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
             DB::table('telegraph_chats')
@@ -375,34 +244,15 @@ class Handler extends WebhookHandler
                 ->first();
 
             $homepage = file_get_contents("https://orakul.com/horoscope/astrologic/{$userChat->horoscope_type}/{$userChat->last_zodiac}/month.html");
-
             $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
-            // Выполняем поиск совпадений
             if (preg_match($pattern, $homepage, $matches)) {
-                // $matches[1] содержит текст, найденный между тегом
                 $foundText = $matches[2];
-                // Выводим найденный текст
                 $horo = trim(stristr($foundText, '<', true));
             } else {
-                // Если совпадений не найдено
                 $horo = "Гороскоп не найден";
             }
 
-            $this->chat->message("🔮 $horo")->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('На завтра'),
-                        ReplyButton::make('На неделю'),
-                    ])
-                    ->row([
-                        ReplyButton::make('На месяц'),
-                        ReplyButton::make('На год'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏠 Главное меню'),
-                    ])
-            )
-                ->send();
+            $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
             DB::table('telegraph_chats')
@@ -418,34 +268,15 @@ class Handler extends WebhookHandler
                 ->first();
 
             $homepage = file_get_contents("https://orakul.com/horoscope/astrologic/{$userChat->horoscope_type}/{$userChat->last_zodiac}/year.html");
-
             $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
-            // Выполняем поиск совпадений
             if (preg_match($pattern, $homepage, $matches)) {
-                // $matches[1] содержит текст, найденный между тегом
                 $foundText = $matches[2];
-                // Выводим найденный текст
                 $horo = trim(stristr($foundText, '<', true));
             } else {
-                // Если совпадений не найдено
                 $horo = "Гороскоп не найден";
             }
 
-            $this->chat->message("🔮 $horo")->replyKeyboard(
-                ReplyKeyboard::make()
-                    ->row([
-                        ReplyButton::make('На завтра'),
-                        ReplyButton::make('На неделю'),
-                    ])
-                    ->row([
-                        ReplyButton::make('На месяц'),
-                        ReplyButton::make('На год'),
-                    ])
-                    ->row([
-                        ReplyButton::make('🏠 Главное меню'),
-                    ])
-            )
-                ->send();
+            $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
             DB::table('telegraph_chats')
