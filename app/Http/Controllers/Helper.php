@@ -41,6 +41,39 @@ class Helper extends Controller
         return $zodiac;
     }
 
+    // Транслит китайского зодиака на англ
+    public static function ChinaZodiacName($text)
+    {
+
+        if ($text == 'Свинья') {
+            $zodiac = 'pig';
+        }elseif ($text == 'Крыса') {
+            $zodiac = 'rat';
+        }elseif ($text == 'Вол') {
+            $zodiac = 'ox';
+        }elseif ($text == 'Тигр') {
+            $zodiac = 'tiger';
+        }elseif ($text == 'Заяц (Кот)') {
+            $zodiac = 'hare';
+        }elseif ($text == 'Дракон') {
+            $zodiac = 'dragon';
+        }elseif ($text == 'Змея') {
+            $zodiac = 'snake';
+        }elseif ($text == 'Лошадь') {
+            $zodiac = 'horse';
+        }elseif ($text == 'Коза') {
+            $zodiac = 'goat';
+        }elseif ($text == 'Обезьяна') {
+            $zodiac = 'monk';
+        }elseif ($text == 'Петух') {
+            $zodiac = 'cock';
+        }elseif ($text == 'Собака') {
+            $zodiac = 'dog';
+        }
+
+        return $zodiac;
+    }
+
     public static function replyKeybordHelperDate()
     {
         return  ReplyKeyboard::make()
@@ -97,8 +130,34 @@ class Helper extends Controller
             ReplyButton::make('🀄️ Карты таро'),
         ])
         ->row([
-            ReplyButton::make('🏵 Восточный гороскоп'),
+            ReplyButton::make('🏵 Китайский гороскоп'),
         ]);
+    }
+
+    public static function replyKeybordEastMainPage()
+    {
+        return  ReplyKeyboard::make()
+        ->row([
+            ReplyButton::make('Свинья'),
+            ReplyButton::make('Крыса'),
+            ReplyButton::make('Вол'),
+            ReplyButton::make('Тигр'),
+        ])
+        ->row([
+            ReplyButton::make('Заяц (Кот)'),
+            ReplyButton::make('Дракон'),
+            ReplyButton::make('Змея'),
+            ReplyButton::make('Лошадь'),
+        ])
+        ->row([
+            ReplyButton::make('Коза'),
+            ReplyButton::make('Обезьяна'),
+            ReplyButton::make('Петух'),
+            ReplyButton::make('Собака'),
+        ])
+        ->row([
+            ReplyButton::make('🏠 Главное меню'),
+        ]);;
     }
 
     public static function hiromant($chat)
