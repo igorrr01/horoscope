@@ -37,21 +37,22 @@ class HomeController extends Controller
         $json = file_get_contents_curl('http://www.boredapi.com/api/activity/');
         //dd($json->activity);
 
-/*         $homepage = file_get_contents('https://orakul.com/horoscope/astrologic/general/aries/today.html');
+         $homepage = file_get_contents('https://orakul.com/horoscope/astrologic/love/aries/year.html');
 
-        $pattern = '/<div class="horoBlock">(.*?)>(.*?)<\/div>/s';
+        $pattern = '/<div class="horoBlock">(.*?)>(.*?)iv>/s';
         // Выполняем поиск совпадений
         if (preg_match($pattern, $homepage, $matches)) {
             // $matches[1] содержит текст, найденный между тегом
             $foundText = $matches[2];
             // Выводим найденный текст
-            $horo = trim(stristr($foundText, '<', true)));
+            $horo = trim(stristr($foundText, 'd', true));
+            $horo = str_replace('<br />', ' ', $horo);
         } else {
             // Если совпадений не найдено
             $horo = "Гороскоп не найден";
         }
 
-        dd($homepage); */
+        dd($horo); 
 
 /*     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "https://gotoshop.ua/ru/kiev/shops/atb/");

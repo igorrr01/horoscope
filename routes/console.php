@@ -24,8 +24,7 @@ Artisan::command('inspire', function () {
 Artisan::command('registerCommand', function () {
     $bot = TelegraphBot::find(1);
     $bot->registerCommands([
-        'command1' => 'command 1 description',
-        'command2' => 'command 2 description'
+        '/start' => 'Главное меню'
     ])->send();
 });
 

@@ -171,12 +171,16 @@ class Handler extends WebhookHandler
 *Привет! Я - гороскоп бот ✨*
 
 Я предскажу твой день на завтра, проверю вашу совместимость с партнером, а также сделаю расклад на картах Таро 🔮
-            ')->photo(Storage::path('start_logo.jpeg'))->send();
+            ')->photo(Storage::path('start_logo.jpeg'))->replyKeyboard(Helper::replyKeybordMainPage())->send();
 
-            $this->chat->message('1')->replyKeyboard(Helper::replyKeybordMainPage())->send();
         } else {
             $this->reply('Неизвестная команда');
         }
+    }
+
+
+    public function taroSend(){
+        Helper::taroList($this->chat);
     }
 
     // Обрабатываем входящие сообщения
@@ -191,8 +195,18 @@ class Handler extends WebhookHandler
         }
 
         if ($text == '🏵 Китайский гороскоп') {
-            $this->chat->message('🔆 Выберете животное по году Вашего рождения и получите предсказание на год')->replyKeyboard(Helper::replyKeybordEastMainPage())->send();
+            $this->chat->message('🔆 Выберете животное по году Вашего рождения и получите предсказание на год')->photo(Storage::path("china_horoscope2.jpg"))->replyKeyboard(Helper::replyKeybordEastMainPage())->send();
         }
+
+        if ($text == '🀄️ Карты таро') {
+            $this->chat->message('🀄️ Выбери карту, которая понравилась больше всего 👀')->photo(Storage::path("taro_main.jpg"))
+            ->keyboard(Keyboard::make()->buttons([
+                Button::make("2 💫")->action("taroSend")->param('id', 1),  
+                Button::make("1 💫")->action("taroSend")->param('id', 2),  
+                Button::make("3 💫")->action("taroSend")->param('id', 3),  
+            ])->chunk(3))->send();
+        }
+        
 
         if ($text == '🔮 Гороскоп' || $text == '💟 Любовный гороскоп') {
 
@@ -263,6 +277,18 @@ class Handler extends WebhookHandler
                 $horo = "Гороскоп не найден";
             }
 
+            $horoscope_base = DB::table('horoscope_base')->select('id')->where('text', $horo)->first();
+            if(!$horoscope_base){
+                DB::table('horoscope_base')->insert([
+                    'text' => $horo,
+                    'h_type' => $userChat->horoscope_type,
+                    'zodiac' => $zodiac,
+                    'time_type' => 'today',
+                    'time' => Carbon::now(),
+                ]);
+            }
+
+
             $dt = Carbon::now();
             $todayDate = str_replace('-', '.', $dt->format('d.m.Y'));
 
@@ -288,6 +314,17 @@ class Handler extends WebhookHandler
                 $horo = "Гороскоп не найден";
             }
 
+            $horoscope_base = DB::table('horoscope_base')->select('id')->where('text', $horo)->first();
+            if(!$horoscope_base){
+                DB::table('horoscope_base')->insert([
+                    'text' => $horo,
+                    'h_type' => $userChat->horoscope_type,
+                    'zodiac' => $userChat->last_zodiac,
+                    'time_type' => 'tomorrow',
+                    'time' => Carbon::now(),
+                ]);
+            }
+
             $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
@@ -306,6 +343,17 @@ class Handler extends WebhookHandler
                 $horo = trim(stristr($foundText, '<', true));
             } else {
                 $horo = "Гороскоп не найден";
+            }
+
+            $horoscope_base = DB::table('horoscope_base')->select('id')->where('text', $horo)->first();
+            if(!$horoscope_base){
+                DB::table('horoscope_base')->insert([
+                    'text' => $horo,
+                    'h_type' => $userChat->horoscope_type,
+                    'zodiac' => $userChat->last_zodiac,
+                    'time_type' => 'weekly',
+                    'time' => Carbon::now(),
+                ]);
             }
 
             $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
@@ -328,6 +376,17 @@ class Handler extends WebhookHandler
                 $horo = "Гороскоп не найден";
             }
 
+            $horoscope_base = DB::table('horoscope_base')->select('id')->where('text', $horo)->first();
+            if(!$horoscope_base){
+                DB::table('horoscope_base')->insert([
+                    'text' => $horo,
+                    'h_type' => $userChat->horoscope_type,
+                    'zodiac' => $userChat->last_zodiac,
+                    'time_type' => 'monthly',
+                    'time' => Carbon::now(),
+                ]);
+            }
+
             $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
 
             // Обновляем последний гороскоп в БД
@@ -346,6 +405,32 @@ class Handler extends WebhookHandler
                 $horo = trim(stristr($foundText, '<', true));
             } else {
                 $horo = "Гороскоп не найден";
+            }
+
+            if($horo == 'Первый квартал'){
+                $pattern = '/<div class="horoBlock">(.*?)>(.*?)iv>/s';
+                // Выполняем поиск совпадений
+                if (preg_match($pattern, $homepage, $matches)) {
+                    // $matches[1] содержит текст, найденный между тегом
+                    $foundText = $matches[2];
+                    // Выводим найденный текст
+                    $horo = trim(stristr($foundText, 'p', true));
+                    $horo = str_replace('<br />', ' ', $horo);
+                } else {
+                    // Если совпадений не найдено
+                    $horo = "Гороскоп не найден";
+                }
+            }
+
+            $horoscope_base = DB::table('horoscope_base')->select('id')->where('text', $horo)->first();
+            if(!$horoscope_base){
+                DB::table('horoscope_base')->insert([
+                    'text' => $horo,
+                    'h_type' => $userChat->horoscope_type,
+                    'zodiac' => $userChat->last_zodiac,
+                    'time_type' => 'year',
+                    'time' => Carbon::now(),
+                ]);
             }
 
             $this->chat->message("🔮 $horo")->replyKeyboard(Helper::replyKeybordHelperDate())->send();
